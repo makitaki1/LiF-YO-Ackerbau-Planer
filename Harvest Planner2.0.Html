@@ -12,7 +12,7 @@
 <style>
     body { 
         font-family: 'Georgia', 'Times New Roman', serif; 
-        font-size: 1.15rem; /* Größere Schriftart aktiviert */
+        font-size: 1.15rem;
         background: radial-gradient(circle, #221a14 0%, #0f0b08 100%); 
         color: #e2d1b7; 
         text-align: center; 
@@ -173,13 +173,6 @@
     }
     .day:hover { border-color: #cca464 !important; transform: scale(1.05); z-index: 10; }
     
-    /* INTERAKTIVE PHASEN-FARBEN (Blau, Dein neues Grün, Rot) */
-	    .erbsen-icon {
-        height: 24px;
-        width: auto;
-        mix-blend-mode: multiply;
-        vertical-align: middle;
-    }
     .day.planted { border: 2px solid #3498db !important; box-shadow: 0 0 8px #3498db; z-index: 5; }
     .day.harvest-active { border: 2px solid #2ecc71 !important; box-shadow: 0 0 10px #2ecc71; background: #1a3c25 !important; z-index: 5; }
     .day.harvest-dead { border: 2px solid #ff4757 !important; box-shadow: 0 0 6px rgba(255,71,87,0.4); background: #2a080c !important; opacity: 0.6; z-index: 5; }
@@ -192,13 +185,13 @@
     .ico-R { color: #3498db; text-shadow: 0 0 6px rgba(52,152,219,0.6); } 
     .ico-SN { color: #ffffff; text-shadow: 0 0 4px rgba(255,255,255,0.5); } 
 
-    /* 📊 BOX 5: NEUE RIESIGE DETAILS-TABELLE GANZ UNTEN */
+    /* 📊 BOX 5: DETAILS-TABELLE */
     .table-container {
         width: 100%;
         max-width: 100%;
         margin: 20px auto 20px auto;
         background: #1c1510;
-        border: 2px solid #cca464;
+        border: 1px solid #544332;
         box-shadow: 0 4px 12px rgba(0,0,0,0.6);
         border-radius: 6px;
         padding: 10px;
@@ -221,7 +214,7 @@
     .action-save-btn:hover { background: #2ecc71; }
     .action-save-btn:disabled { background: #444; border-color: #555; color: #888; cursor: not-allowed; }
     .detail-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .detail-table th, .detail-table td { padding: 6px 8px; border: 1px solid #423326; text-align: left; }
+    .detail-table th, .detail-table td { padding: 6px 8px; border: 1px solid #423326; text-align: left; vertical-align: middle; }
     .detail-table th { background: #110b08; color: #cca464; font-weight: bold; font-size: 10px; text-transform: uppercase; }
     .detail-table tbody tr { cursor: pointer; background: #2b2119; }
     .detail-table tbody tr:hover { background: #3a2e1d; }
@@ -229,13 +222,14 @@
     .delete-x-btn { background: transparent; color: #ff4757; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
     .delete-x-btn:hover { transform: scale(1.2); }
 
+    .sub-ingame-date { font-size: 10px; color: #cca464; margin-top: 2px; }
+
     @media (max-width: 1100px) { .top-dashboard-bar { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
 
     <div class="header-container">
-        <!-- Das händische v2.0 wurde am Ende gelöscht, da JavaScript das Schild jetzt vollautomatisch zeichnet -->
         <h1 id="main-title">Life is Feudal Ernte Planer ( Jahres Wetter / Ackerbau Kalender + Schaltjahr )</h1>
     </div>
     
@@ -259,22 +253,16 @@
         <div class="dashboard-box" id="box-3-korrektur">
             <span><span id="lbl-box3-title">Serverzeit (Ingame)</span> <span id="live-ingametime" class="dashboard-clock">-</span></span>
             <div class="manual-align-row" style="width: 100%; margin-top: 4px; gap: 4px;">
-                <!-- Stunden-Auswahlmenü -->
                 <select id="sync-hour" onchange="syncWithDropdowns()" style="padding: 3px; font-size: 11px; font-family: monospace; background: #110b08; color: #cca464; border: 1px solid #423326; border-radius: 2px; text-align: center; width: 45px;">
-                    <!-- Wird per JS automatisch mit 00-23 befüllt -->
                 </select>
                 <span style="font-size: 11px; font-weight: bold; color: #cca464;">:</span>
-                <!-- Minuten-Auswahlmenü -->
                 <select id="sync-minute" onchange="syncWithDropdowns()" style="padding: 3px; font-size: 11px; font-family: monospace; background: #110b08; color: #cca464; border: 1px solid #423326; border-radius: 2px; text-align: center; width: 45px;">
-                    <!-- Wird per JS automatisch mit 00-59 befüllt -->
                 </select>
-                <!-- Kleines, dezentes Label daneben -->
-                <!-- Das neue, sprachgesteuerte Label -->
                 <span id="adjust-label" style="font-size: 11px; color: #888; margin-left: 4px; white-space: nowrap;">// Manuell</span>
             </div>
         </div>
 
-        <!-- BOX 4 (NEU: SPRACHE & SCHALTJAHR) -->
+        <!-- BOX 4 (SPRACHE & SCHALTJAHR) -->
         <div class="dashboard-box" id="box-4-einstellungen" style="min-height: 58px; justify-content: space-around; gap: 4px;">
             <div class="lang-switcher" style="justify-content: center; width: 100%;">
                 <button class="lang-btn" id="lang-de" onclick="changeLanguage('de')">DE</button>
@@ -288,14 +276,14 @@
         </div>
     </div>
 
-    <!-- 📊 BOX 5: DETAILS-TABELLE ÜBER DEN MONATEN (Hier kommt im nächsten Schritt das Saatgut rein!) -->
+    <!-- 📊 BOX 5: DETAILS-TABELLE ÜBER DEN MONATEN -->
+    <div class="table-container">
         <div class="table-title-row" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-<div style="display: flex; align-items: center; gap: 8px;">
-    <img src="HIER_DEIN_DATEINAME.jpg" style="height: 24px; width: auto; mix-blend-mode: multiply; vertical-align: middle;" alt="Erbse">
-    <div class="table-title" id="lbl-box5-title">Ernte-Planer</div>
-</div>
-                <!-- HIER WANDERT DAS SAATGUT REIN -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">🌾</span>
+                    <div class="table-title" id="lbl-box5-title">Ernte-Planer</div>
+                </div>
                 <div class="seed-grid" id="seed-buttons-container"></div>
             </div>
             <button class="action-save-btn" id="main-save-btn" onclick="saveCurrentPlan()" disabled>Planung Speichern</button>
@@ -319,7 +307,7 @@
         </div>
     </div>
 
-    <!-- KALENDERMONATE TEIL 1 -->
+    <!-- KALENDERMONATE -->
     <div class="dashboard-grid">
         <div class="month-box"><div class="month-title" id="title-jan">Januar</div><div class="days-grid" id="grid-jan"></div></div>
         <div class="month-box"><div class="month-title" id="title-feb">Februar</div><div class="days-grid" id="grid-feb"></div></div>
@@ -350,6 +338,7 @@
         { id: "nov", days: 30, de: "November", en: "November", ru: "Ноябрь", es: "Noviembre", fr: "Novembre", zh: "十一月" },
         { id: "dec", days: 31, de: "Dezember", en: "December", ru: "Декабрь", es: "Diciembre", fr: "Décembre", zh: "十二月" }
     ];
+
     const translations = {
         title: { 
             de: "Life is Feudal Ernte Planer ( Jahres Wetter / Ackerbau Kalender + Schaltjahr )", 
@@ -359,22 +348,8 @@
             fr: "Life is Feudal Planificateur de Récolte ( Calendrier Annuel Météo / Agriculture + Année Bissextile )", 
             zh: "Life is Feudal 收获计划器 ( 年度天气 / 农耕日历 + 闰年 )"
         },
-        manualLabel: { 
-            de: "// Manuell", 
-            en: "// Manual", 
-            ru: "// Вручную", 
-            es: "// Manual", 
-            fr: "// Manuel", 
-            zh: "// 手动" 
-        },
-        leapBtn: {
-            de: "Schaltjahr", 
-            en: "Leap Year", 
-            ru: "Високосный год",
-            es: "Año Bisiesto", 
-            fr: "Année Bissextile", 
-            zh: "闰年"
-        },
+        manualLabel: { de: "// Manuell", en: "// Manual", ru: "// Вручную", es: "// Manual", fr: "// Manuel", zh: "// 手动" },
+        leapBtn: { de: "Schaltjahr", en: "Leap Year", ru: "Високосный год", es: "Año Bisiesto", fr: "Année Bissextile", zh: "闰年" },
         weekdays: {
             de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"], en: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
             ru: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"], es: ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"],
@@ -383,12 +358,10 @@
         box1Title: { de: "Echtzeit (Computer)", en: "Real Time (PC)", ru: "Время (ПК)", es: "Tiempo Real (PC)", fr: "Temps Réel (PC)", zh: "本地时间 (电脑)" },
         box2Title: { de: "Server-Tageslänge", en: "Server Day Length", ru: "Длительность дня", es: "Duración del Día", fr: "Durée du Jour", zh: "服务器日长" },
         dayUnit: { de: "Stunden = 1 Tag", en: "Hours = 1 Day", ru: "ч. = 1 День", es: "Horas = 1 Día", fr: "Heures = 1 Jour", zh: "小时 = 1 天" },
-        box3Title: { de: "Serverzeit (Ingame)", en: "Server Time (Ingame)", ru: "Время на servеre", es: "Hora del Servidor", fr: "Heure du Serveur", zh: "游戏内时间" },
-        tzLabel: { de: "Zeitzonen Korrektur", en: "Timezone Correction", ru: "Коррекция часового пояса", es: "Corrección de Zona", fr: "Correction Fuseau", zh: "时区校正" },
-        box4Title: { de: "Saatgut Auswahl", en: "Seed Selection", ru: "Выбор семян", es: "Selección de Semillas", fr: "Choix des Graines", zh: "作物种子选择" },
+        box3Title: { de: "Serverzeit (Ingame)", en: "Server Time (Ingame)", ru: "Время на сервере", es: "Hora del Servidor", fr: "Heure du Serveur", zh: "游戏内时间" },
         box5Title: { de: "Ernte-Planer", en: "Harvest Planner", ru: "Планировщик урожая", es: "Planificador de Cosecha", fr: "Planificateur de Récolte", zh: "收获计划器" },
-        saveBtn: { de: "Planung Speichern", en: "Save Plan", ru: "Сохранить plan", es: "Guardar Plan", fr: "Sauvegarder", zh: "保存耕作计划" },
-        noEntries: { de: "Keine gespeicherten Aussaten vorhanden", en: "No saved plantings available", ru: "Нет сохраненных записей о посеве", es: "No hay cultivos guardados", fr: "Aucun enregistrement trouvé", zh: "暂无已保存 der 播种数据记录" },
+        saveBtn: { de: "Planung Speichern", en: "Save Plan", ru: "Сохранить", es: "Guardar Plan", fr: "Sauvegarder", zh: "保存耕作计划" },
+        noEntries: { de: "Keine gespeicherten Aussaten vorhanden", en: "No saved plantings available", ru: "Нет сохраненных записей", es: "No hay cultivos guardados", fr: "Aucun enregistrement", zh: "暂无记录" },
         thCrop: { de: "Saatgut", en: "Crop", ru: "Семена", es: "Semilla", fr: "Graine", zh: "作物" },
         thPlantedDay: { de: "Aussaat im Spiel Tag", en: "Plant Day (Ingame)", ru: "День посева", es: "Día de Siembra", fr: "Jour Semis", zh: "游戏内播种日" },
         thW8: { de: "8. Wetterwechsel / Ernte1", en: "8th Weather Change / Harvest 1", ru: "8-я смена погоды / Урожай 1", es: "8º Cambio de Clima / Cosecha 1", fr: "8ème Changement Météo / Récolte 1", zh: "第8次天气 change / 收成 1" },
@@ -396,12 +369,7 @@
         thW10: { de: "10. Wetterwechsel / Ernte3", en: "10th Weather Change / Harvest 3", ru: "10-я смена погоды / Урожай 3", es: "10º Cambio de Clima / Cosecha 3", fr: "10ème Changement Météo / Récolte 3", zh: "第10次天气 change / 收成 3" },
         thW11: { de: "11. Wetterwechsel / Verdorrt", en: "11th Weather Change / Withered", ru: "11-я смена погоды / Засохло", es: "11º Cambio de Clima / Marchito", fr: "11ème Changement Météo / Flétri", zh: "第11次天气 change / 枯萎 💀" },
         thAction: { de: "Aktion", en: "Action", ru: "Действие", es: "Acción", fr: "Action", zh: "操作" },
-
-        regioBonus: {
-            de: " (Regio-Bonus)", en: " (Regio Bonus)", ru: " (Регио-Бонус)",
-            es: " (Bono Regio)", fr: " (Bonus Régio)", zh: " (区域特产加成)"
-        },
-
+        regioBonus: { de: " (Regio-Bonus)", en: " (Regio Bonus)", ru: " (Регио-Бонус)", es: " (Bono Regio)", fr: " (Bonus Régio)", zh: " (区域特产加成)" },
         crops: {
             Weizen:    { de: "Weizen", en: "Wheat", ru: "Пшеница", es: "Trigo", fr: "Blé", zh: "小麦" },
             Flachs:    { de: "Flachs", en: "Flax", ru: "Лён", es: "Lino", fr: "Lin", zh: "亚麻" },
@@ -429,7 +397,8 @@
         "R", "R", "R", "S", "B", "B", "R", "B", "B", "S", "S", "S", "R", "B", "B", "S", "S", "S", "S", "R", "R", "R", "B", "S", "S", "S", "R", "R", "R", "S",
         "SN", "S", "S", "S", "B", "S", "S", "S", "S", "SN", "S", "S", "S", "B", "S", "S", "SN", "S", "S", "SN", "S", "S", "B", "S", "S", "B", "S", "S", "S", "S", "SN"
     ];
-    let currentLang = localStorage.getItem('lif_cal_lang') || 'en';
+
+    let currentLang = localStorage.getItem('lif_cal_lang') || 'de';
     let isLeapYear = localStorage.getItem('lif_cal_leap') === 'true';
     let activeWeatherArray = [...rawWeather];
     let leapWeather = [];
@@ -437,7 +406,7 @@
     let selectedGlobalIndex = null;
     let selectedSeed = localStorage.getItem('lif_cal_selected_seed') || "";
     let currentDaylength = parseFloat(localStorage.getItem('lif_cal_daylength')) || 4.0;
-    let manualHourOffset = parseFloat(localStorage.getItem('lif_cal_hour_offset')) || 0;
+    let manualGameMinutesOffset = parseFloat(localStorage.getItem('lif_cal_game_minutes_offset')) || 0;
     let savedPlans = JSON.parse(localStorage.getItem('lif_cal_saved_plans')) || [];
     let activeViewId = null;
 
@@ -445,7 +414,7 @@
         leapWeather = [];
         for (let i = 0; i < 59; i++) leapWeather.push(rawWeather[i]);
         for (let i = 59; i < 365; i++) leapWeather.push(rawWeather[i]);
-        leapWeather.push(rawWeather[0]); // <--- HIER REPARIERT MIT DER [0]
+        leapWeather.push(rawWeather[0]);
     }
 
     function changeLanguage(lang) {
@@ -456,14 +425,12 @@
         const activeBtn = document.getElementById('lang-' + lang);
         if (activeBtn) activeBtn.classList.add('active');
         
-        // Nutzt innerHTML, um den übersetzten Text UND das goldene v2.0-Schild einzufügen
         document.getElementById('main-title').innerHTML = `${translations.title[lang]} <span style="font-size: 12px; font-family: monospace; color: #cca464; background: #1c1510; border: 1px solid #544332; padding: 2px 6px; border-radius: 3px; vertical-align: middle; margin-left: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);">v2.0</span>`;
         
         const b1Title = document.getElementById('lbl-realtime-title');
         if (b1Title) b1Title.innerHTML = `${translations.box1Title[lang]} <span id="realtime-clock" class="dashboard-clock">-</span>`;
         if (document.getElementById('lbl-daylength-title')) document.getElementById('lbl-daylength-title').innerText = translations.box2Title[lang];
         if (document.getElementById('lbl-box3-title')) document.getElementById('lbl-box3-title').innerText = translations.box3Title[lang];
-        if (document.getElementById('lbl-box4-title')) document.getElementById('lbl-box4-title').innerText = translations.box4Title[lang];
         if (document.getElementById('lbl-box5-title')) document.getElementById('lbl-box5-title').innerText = translations.box5Title[lang];
         if (document.getElementById('main-save-btn')) document.getElementById('main-save-btn').innerText = translations.saveBtn[lang];
         
@@ -476,8 +443,6 @@
         if (document.getElementById('th-w10')) document.getElementById('th-w10').innerText = translations.thW10[lang];
         if (document.getElementById('th-w11')) document.getElementById('th-w11').innerText = translations.thW11[lang];
         
-        // REPARIERT: Das alte updateTimezoneLabel() wurde gelöscht.
-        // Stattdessen wird hier das neue "// Manuell" Feld übersetzt:
         if (document.getElementById('adjust-label')) {
             document.getElementById('adjust-label').innerText = translations.manualLabel[lang];
         }
@@ -516,10 +481,6 @@
         if (label) label.innerText = `${currentDaylength.toFixed(1)} ${translations.dayUnit[currentLang]}`;
     }
 
-function updateTimezoneLabel() {
-    // Stillgelegt, da die alten Zeitzonen-Knöpfe entfernt wurden
-}
-
     function adjustDaylength(amount) {
         let nextValue = currentDaylength + amount;
         if (nextValue >= 0.5 && nextValue <= 24.0) {
@@ -528,14 +489,6 @@ function updateTimezoneLabel() {
             updateDaylengthLabel();
             recalculateTimes();
         }
-    }
-
-    function adjustTime(amount) {
-        manualHourOffset += amount;
-        localStorage.setItem('lif_cal_hour_offset', manualHourOffset);
-        updateTimezoneLabel();
-        updateClocksAndIngame();
-        recalculateTimes();
     }
 
     function selectSeed(cropKey) {
@@ -560,55 +513,40 @@ function updateTimezoneLabel() {
         }
     }
 
-function updateClocksAndIngame() {
-    updateRealtimeClock();
-    const now = new Date();
-    
-    // Sicherstellen, dass die Variable existiert, falls sie noch nicht geladen wurde
-    if (typeof manualGameMinutesOffset === 'undefined') {
-        manualGameMinutesOffset = parseFloat(localStorage.getItem('lif_cal_game_minutes_offset')) || 0;
+    function getCurrentIngameMinutes() {
+        const now = new Date();
+        // Kontinuierliche Zeit seit Epoche in realen Minuten (kein Mitternachts-Sprung mehr!)
+        const totalRealMinutes = now.getTime() / (1000 * 60);
+        const dayLengthMinutes = currentDaylength * 60;
+
+        let currentBlockMinutes = totalRealMinutes % dayLengthMinutes;
+        if (currentBlockMinutes < 0) currentBlockMinutes += dayLengthMinutes;
+
+        const dayProgress = currentBlockMinutes / dayLengthMinutes;
+        let totalGameMinutes = (dayProgress * 1440 + manualGameMinutesOffset) % 1440;
+        if (totalGameMinutes < 0) totalGameMinutes += 1440;
+        return totalGameMinutes;
     }
-    
-    // 1. Die exakten Minuten, die am heutigen PC-Tag seit Mitternacht vergangen sind
-    const realMinutesToday = (now.getHours() * 60) + now.getMinutes() + (now.getSeconds() / 60);
-    
-    // 2. Die eingestellte Tageslänge in realen Minuten umrechnen
-    const dayLengthMinutes = currentDaylength * 60;
 
-    // 3. Modulo-Restwert: Wo befinden wir uns im aktuellen Zeitfenster des PC-Tages?
-    let currentBlockMinutes = realMinutesToday % dayLengthMinutes;
+    function updateClocksAndIngame() {
+        updateRealtimeClock();
+        const totalGameMinutes = getCurrentIngameMinutes();
 
-    // 4. Prozentualer Fortschritt innerhalb des aktuellen In-Game-Tages (0.0 bis 1.0)
-    const dayProgress = currentBlockMinutes / dayLengthMinutes;
-
-    // 5. Umrechnung in die 1440 Minuten eines vollen In-Game-Tages
-    let totalGameMinutes = dayProgress * 1440;
-    
-    // 6. Den über die Dropdowns festgelegten Versatz hinzurechnen
-    totalGameMinutes = (totalGameMinutes + manualGameMinutesOffset) % 1440;
-    if (totalGameMinutes < 0) totalGameMinutes += 1440;
-
-    // 7. Aufteilung in Stunden, Minuten und Sekunden für die Live-Anzeige
-    let currentIngameHour = Math.floor(totalGameMinutes / 60);
-    let currentIngameMinute = Math.floor(totalGameMinutes % 60);
-    let currentIngameSecond = Math.floor((totalGameMinutes * 60) % 60);
-    
-    const f = (num) => String(num).padStart(2, '0');
-    const ingameClockEl = document.getElementById('live-ingametime');
-    if (ingameClockEl) {
-        ingameClockEl.innerText = `${f(currentIngameHour)}:${f(currentIngameMinute)}:${f(currentIngameSecond)}`;
+        let currentIngameHour = Math.floor(totalGameMinutes / 60);
+        let currentIngameMinute = Math.floor(totalGameMinutes % 60);
+        let currentIngameSecond = Math.floor((totalGameMinutes * 60) % 60);
+        
+        const f = (num) => String(num).padStart(2, '0');
+        const ingameClockEl = document.getElementById('live-ingametime');
+        if (ingameClockEl) {
+            ingameClockEl.innerText = `${f(currentIngameHour)}:${f(currentIngameMinute)}:${f(currentIngameSecond)}`;
+        }
     }
-}
-
-
 
     function handleDayClick(dayEl, dayIndex) {
         activeViewId = null;
-        const ingameTimeStr = document.getElementById('live-ingametime').innerText.split(':');
-        const exactIngameHourAtPlanted = parseInt(ingameTimeStr[0]) + (parseInt(ingameTimeStr[1] || 0) / 60);
-
-        let currentMonthConfig = null;
         let runningDays = 0;
+        let currentMonthConfig = null;
         for (let m of monthsConfig) {
             if (dayIndex >= runningDays && dayIndex < runningDays + m.days) {
                 currentMonthConfig = m;
@@ -618,12 +556,18 @@ function updateClocksAndIngame() {
         }
         const dayNumInMonth = dayIndex - runningDays + 1;
 
-        selectedGlobalIndex = { idx: dayIndex, day: dayNumInMonth, monthConfig: currentMonthConfig, plantedHour: exactIngameHourAtPlanted };
+        selectedGlobalIndex = { 
+            idx: dayIndex, 
+            day: dayNumInMonth, 
+            monthConfig: currentMonthConfig, 
+            plantedAtGameMinutes: getCurrentIngameMinutes() 
+        };
         localStorage.setItem('lif_cal_planted_day', dayIndex);
 
         recalculateTimes();
         checkSaveButtonState();
     }
+
     function recalculateTimes() {
         if (selectedGlobalIndex === null) return;
         let calcResult = calculatePhases(selectedGlobalIndex.idx);
@@ -640,7 +584,7 @@ function updateClocksAndIngame() {
         let ww8 = -1, ww9 = -1, ww10 = -1, ww11 = -1;
         const totalDays = isLeapYear ? 366 : 365;
 
-        for (let i = 0; i < totalDays; i++) {
+        for (let i = 0; i < totalDays * 2; i++) {
             let checkIdx = (startIdx + i) % totalDays;
             let curWeather = activeWeatherArray[checkIdx];
             if (curWeather === "S" || curWeather === "R") {
@@ -668,40 +612,50 @@ function updateClocksAndIngame() {
         if(w11 !== -1) document.getElementById('day-idx-' + w11)?.classList.add('harvest-dead');
     }
 
-function getPhaseString(targetGlobalIdx, isDead = false) {
-    if (targetGlobalIdx === -1 || selectedGlobalIndex === null) return "N/A";
-    const totalDays = isLeapYear ? 366 : 365;
-    
-    // 1. Wie viele In-Game-Tage liegen zwischen Aussaat und Ernte?
-    let ingameDaysDiff = targetGlobalIdx - selectedGlobalIndex.idx;
-    if (ingameDaysDiff < 0) ingameDaysDiff += totalDays;
-    
-    // 2. Umrechnung der In-Game-Tage in reale Echtzeit-Stunden basierend auf der Tageslänge
-    const realHoursDiff = ingameDaysDiff * currentDaylength;
-    
-    // 3. Fester Anker: Das Erntedatum berechnet sich ab dem Aussaat-Moment
-    const realTargetDate = new Date();
-    realTargetDate.setMilliseconds(realTargetDate.getMilliseconds() + (realHoursDiff * 60 * 60 * 1000));
-    
-    // 4. Formatierung der Anzeige für die Tabelle
-    const weekday = realTargetDate.toLocaleDateString(currentLang, { weekday: 'short' });
-    const dateStr = realTargetDate.toLocaleDateString(currentLang, { day: '2-digit', month: '2-digit' });
-    const timeStr = realTargetDate.toLocaleTimeString(currentLang, { hour: '2-digit', minute: '2-digit' });
-    
-    if (isDead) {
-        return `${weekday}. ${dateStr}. ${timeStr} 💀`;
+    function getPhaseString(targetGlobalIdx, isDead = false) {
+        if (targetGlobalIdx === -1 || selectedGlobalIndex === null) return "N/A";
+        const totalDays = isLeapYear ? 366 : 365;
+        
+        // 1. Ingame-Tagesdifferenz
+        let ingameDaysDiff = targetGlobalIdx - selectedGlobalIndex.idx;
+        if (ingameDaysDiff < 0) ingameDaysDiff += totalDays;
+        
+        // 2. Zielmonat & Tag im Spiel ermitteln
+        let runningDays = 0;
+        let targetMonthConfig = null;
+        for (let m of monthsConfig) {
+            if (targetGlobalIdx >= runningDays && targetGlobalIdx < runningDays + m.days) {
+                targetMonthConfig = m;
+                break;
+            }
+            runningDays += m.days;
+        }
+        const targetDayNum = targetGlobalIdx - runningDays + 1;
+        const targetMonthName = targetMonthConfig ? targetMonthConfig[currentLang] : "";
+
+        // 3. Exakte verbleibende Spielminuten bis zum Wetterwechsel (00:00 Ingame des Zieltags)
+        const currentIngameMin = getCurrentIngameMinutes();
+        let totalGameMinutesRemaining = (ingameDaysDiff * 1440) - currentIngameMin;
+        if (totalGameMinutesRemaining < 0) totalGameMinutesRemaining += (totalDays * 1440);
+
+        // 4. Umrechnung in echte PC-Minuten
+        const realMinutesRemaining = totalGameMinutesRemaining * (currentDaylength / 24);
+        const realTargetDate = new Date(Date.now() + (realMinutesRemaining * 60 * 1000));
+        
+        const weekday = realTargetDate.toLocaleDateString(currentLang, { weekday: 'short' });
+        let dateStr = realTargetDate.toLocaleDateString(currentLang, { day: '2-digit', month: '2-digit' });
+        if (!dateStr.endsWith('.')) dateStr += '.';
+        const timeStr = realTargetDate.toLocaleTimeString(currentLang, { hour: '2-digit', minute: '2-digit' });
+        
+        const targetWeather = activeWeatherArray[targetGlobalIdx];
+        const icon = isDead ? "💀" : (weatherIcons[targetWeather] || "");
+        const regio = (!isDead && targetWeather === "S") ? translations.regioBonus[currentLang] : "";
+        
+        return `
+            <div><strong>${weekday}. ${dateStr} ${timeStr} ${icon}${regio}</strong></div>
+            <div class="sub-ingame-date">(Ingame: ${targetDayNum}. ${targetMonthName})</div>
+        `;
     }
-    
-    const targetWeather = activeWeatherArray[targetGlobalIdx];
-    const icon = weatherIcons[targetWeather] || "";
-    let resultText = `${weekday}. ${dateStr}. ${timeStr} ${icon}`;
-    
-    if (targetWeather === "S") {
-        resultText += translations.regioBonus[currentLang];
-    }
-    
-    return resultText;
-}
 
     function checkSaveButtonState() {
         const btn = document.getElementById('main-save-btn');
@@ -730,7 +684,6 @@ function getPhaseString(targetGlobalIdx, isDead = false) {
             globalIdx: selectedGlobalIndex.idx,
             plantDayNum: realDayInMonth, 
             plantedMonthId: selectedGlobalIndex.monthConfig.id,
-            plantedHour: selectedGlobalIndex.plantedHour, 
             plantedRealtimeText: aussaatEchtzeit,
             h8Text: getPhaseString(calc.ww8), 
             h9Text: getPhaseString(calc.ww9), 
@@ -770,7 +723,7 @@ function getPhaseString(targetGlobalIdx, isDead = false) {
             runningDays += m.days;
         }
 
-        selectedGlobalIndex = { idx: plan.globalIdx, day: plan.plantDayNum, monthConfig: foundConfig, plantedHour: plan.plantedHour };
+        selectedGlobalIndex = { idx: plan.globalIdx, day: plan.plantDayNum, monthConfig: foundConfig };
         localStorage.setItem('lif_cal_planted_day', plan.globalIdx);
 
         clearAllCalendarHighlights();
@@ -805,10 +758,10 @@ function getPhaseString(targetGlobalIdx, isDead = false) {
             tr.innerHTML = `
                 <td style="font-weight:bold; color:#cca464;">${translations.crops[p.crop][currentLang]}</td>
                 <td style="color:#3498db; font-weight:bold;">${displayDayLabel}</td>
-                <td style="color:#2ecc71; font-weight:bold;">${p.h8Text}</td>
-                <td style="color:#2ecc71; font-weight:bold;">${p.h9Text}</td>
-                <td style="color:#2ecc71; font-weight:bold;">${p.h10Text}</td>
-                <td style="color:#ff4757; font-weight:bold;">${p.deadText}</td>
+                <td style="color:#2ecc71;">${p.h8Text}</td>
+                <td style="color:#2ecc71;">${p.h9Text}</td>
+                <td style="color:#2ecc71;">${p.h10Text}</td>
+                <td style="color:#ff4757;">${p.deadText}</td>
                 <td style="text-align:center;"><button class="delete-x-btn" onclick="deletePlan(${p.id}, event)">❌</button></td>
             `;
             tbody.appendChild(tr);
@@ -825,8 +778,6 @@ function getPhaseString(targetGlobalIdx, isDead = false) {
     function updateLeapButtonVisuals() {
         const leapBtn = document.getElementById('leap-btn');
         if (!leapBtn) return;
-        
-        // Holt den korrekt übersetzten Begriff ("Schaltjahr", "Leap Year", etc.)
         leapBtn.innerText = translations.leapBtn[currentLang];
         
         if (isLeapYear) {
@@ -840,7 +791,7 @@ function getPhaseString(targetGlobalIdx, isDead = false) {
         }
     }
 
-function generateCalendar() {
+    function generateCalendar() {
         generateLeapWeatherArray();
         if (isLeapYear) {
             activeWeatherArray = [...leapWeather];
@@ -897,81 +848,77 @@ function generateCalendar() {
         }
     }
 
-function initTimeDropdowns() {
-    const hourSelect = document.getElementById('sync-hour');
-    const minSelect = document.getElementById('sync-minute');
-    if (!hourSelect || !minSelect) return;
+    function initTimeDropdowns() {
+        const hourSelect = document.getElementById('sync-hour');
+        const minSelect = document.getElementById('sync-minute');
+        if (!hourSelect || !minSelect) return;
 
-    hourSelect.innerHTML = "";
-    minSelect.innerHTML = "";
+        hourSelect.innerHTML = "";
+        minSelect.innerHTML = "";
 
-    // 1. Stunden von 00 bis 23 generieren
-    for (let h = 0; h < 24; h++) {
-        const opt = document.createElement('option');
-        opt.value = h;
-        opt.textContent = String(h).padStart(2, '0');
-        hourSelect.appendChild(opt);
-    }
+        for (let h = 0; h < 24; h++) {
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = String(h).padStart(2, '0');
+            hourSelect.appendChild(opt);
+        }
 
-    // 2. Minutes von 00 bis 59 generieren
-    for (let m = 0; m < 60; m++) {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.textContent = String(m).padStart(2, '0');
-        minSelect.appendChild(opt);
-    }
+        for (let m = 0; m < 60; m++) {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = String(m).padStart(2, '0');
+            minSelect.appendChild(opt);
+        }
 
-    // 3. Erst Uhrzeit berechnen lassen, falls noch nicht geschehen
-    if (typeof updateClocksAndIngame === 'function') {
         updateClocksAndIngame();
+
+        const currentClockText = document.getElementById('live-ingametime').innerText;
+        if (currentClockText && currentClockText !== "-") {
+            const parts = currentClockText.split(':');
+            hourSelect.value = parseInt(parts[0]) || 0;
+            minSelect.value = parseInt(parts[1]) || 0;
+        }
     }
 
-    // 4. Jetzt die Dropdowns auf die berechnete In-Game-Zeit einstellen
-    const currentClockText = document.getElementById('live-ingametime').innerText;
-    if (currentClockText && currentClockText !== "-") {
-        const parts = currentClockText.split(':');
-        hourSelect.value = parseInt(parts[0]) || 0;
-        minSelect.value = parseInt(parts[1]) || 0;
+    function syncWithDropdowns() {
+        const hourSelect = document.getElementById('sync-hour');
+        const minSelect = document.getElementById('sync-minute');
+        if (!hourSelect || !minSelect) return;
+
+        const targetHour = parseInt(hourSelect.value) || 0;
+        const targetMin = parseInt(minSelect.value) || 0;
+        const totalTargetGameMinutes = (targetHour * 60) + targetMin;
+
+        const now = new Date();
+        const totalRealMinutes = now.getTime() / (1000 * 60);
+        const dayLengthMinutes = currentDaylength * 60;
+
+        let currentBlockMinutes = totalRealMinutes % dayLengthMinutes;
+        if (currentBlockMinutes < 0) currentBlockMinutes += dayLengthMinutes;
+
+        const dayProgress = currentBlockMinutes / dayLengthMinutes;
+        const pureGameMinutes = dayProgress * 1440;
+
+        let neededOffset = totalTargetGameMinutes - pureGameMinutes;
+        neededOffset = neededOffset % 1440;
+        if (neededOffset < 0) neededOffset += 1440;
+
+        manualGameMinutesOffset = neededOffset;
+        localStorage.setItem('lif_cal_game_minutes_offset', manualGameMinutesOffset);
+
+        updateClocksAndIngame();
+        recalculateTimes();
     }
-}
 
-function syncWithDropdowns() {
-    const hourSelect = document.getElementById('sync-hour');
-    const minSelect = document.getElementById('sync-minute');
-    if (!hourSelect || !minSelect) return;
-
-    const targetHour = parseInt(hourSelect.value) || 0;
-    const targetMin = parseInt(minSelect.value) || 0;
-    const totalTargetGameMinutes = (targetHour * 60) + targetMin;
-
-    const now = new Date();
-    const realMinutesToday = (now.getHours() * 60) + now.getMinutes() + (now.getSeconds() / 60);
-    const dayLengthMinutes = currentDaylength * 60;
-
-    const currentBlockMinutes = realMinutesToday % dayLengthMinutes;
-    const dayProgress = currentBlockMinutes / dayLengthMinutes;
-    const pureGameMinutesToday = dayProgress * 1440;
-
-    let neededOffset = totalTargetGameMinutes - pureGameMinutesToday;
-    neededOffset = neededOffset % 1440;
-    if (neededOffset < 0) neededOffset += 1440;
-
-    manualGameMinutesOffset = neededOffset;
-    localStorage.setItem('lif_cal_game_minutes_offset', manualGameMinutesOffset);
-
-    if (typeof updateClocksAndIngame === 'function') updateClocksAndIngame();
-    if (typeof recalculateTimes === 'function') recalculateTimes();
-}
-
-window.onload = () => {
-    updateLeapButtonVisuals();
-    generateCalendar();
-    if (typeof updateClocksAndIngame === 'function') updateClocksAndIngame();
-    initTimeDropdowns(); // <-- Steht jetzt an korrekter Stelle NACH der Uhr-Initialisierung
-    setInterval(() => {
-        if (typeof updateClocksAndIngame === 'function') updateClocksAndIngame();
-    }, 1000);
-};
+    window.onload = () => {
+        updateLeapButtonVisuals();
+        generateCalendar();
+        updateClocksAndIngame();
+        initTimeDropdowns();
+        setInterval(() => {
+            updateClocksAndIngame();
+        }, 1000);
+    };
 </script>
 </body>
 </html>
